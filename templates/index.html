@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The House That Remembered - Offline 3D Mystery Thriller</title>
+    <!-- Fully Offline Local Vendor Stylesheet -->
+    <link rel="stylesheet" href="/static/vendor/tailwind.min.css">
+    <!-- Atmospheric Game Stylesheet -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="bg-black text-gray-200 select-none overflow-hidden">
+
+    <!-- 3D WebGL Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Atmospheric Post-Processing Overlays -->
+    <div class="horror-vignette"></div>
+    <div class="film-grain"></div>
+    <div id="disorientation-overlay"></div>
+    <div id="cinematic-subtitle"></div>
+
+    <!-- First-Person Center Reticle & Interaction Tooltip -->
+    <div id="crosshair"></div>
+    <div id="interact-prompt">[E] Examine</div>
+    <div id="click-to-control-prompt" class="pointer-lock-prompt hidden">
+        <span>🖱️ Click anywhere to look around &bull; WASD to move</span>
+    </div>
+
+    <!-- Top-Left Detective Objective Banner -->
+    <div id="objective-box">
+        <div id="objective-title">Current Objective</div>
+        <div id="objective-text">Follow the road home.</div>
+    </div>
+
+    <!-- Bottom HUD (Notebook Button & Inventory Quick Bar) -->
+    <div id="bottom-hud">
+        <button id="hud-notebook-btn" class="hud-btn">
+            <span>📖</span>
+            <span>Detective Notebook [N / Tab]</span>
+        </button>
+
+        <div id="inventory-bar">
+            <!-- Dynamically populated from game_state.js -->
+        </div>
+    </div>
+
+    <!-- Clue Detailed Examination Modal -->
+    <div id="inspect-modal">
+        <div class="inspect-card">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                <span id="inspect-title" class="inspect-title">Clue Inspection</span>
+                <button id="inspect-close" class="text-gray-400 hover:text-white font-mono text-xl">&times;</button>
+            </div>
+            <img id="inspect-img" class="inspect-image-preview" src="" alt="Clue Detail">
+            <div id="inspect-desc" class="inspect-description">
+                Details and transcripts will appear here.
+            </div>
+        </div>
+    </div>
+
+    <!-- Detective Notebook / Deduction Overlay -->
+    <div id="notebook-modal">
+        <div class="notebook-binder">
+            <!-- Binder Header -->
+            <div class="notebook-header">
+                <div class="notebook-title">
+                    <span>📁</span>
+                    <span>PERSONAL JOURNAL & INVESTIGATION BOARD</span>
+                </div>
+                <button id="nb-close-btn" class="text-gray-400 hover:text-yellow-400 font-mono text-xl tracking-wider">[ESC] CLOSE</button>
+            </div>
+
+            <!-- Tab Navigation Bar (Progressive & Non-Spoiler) -->
+            <div class="notebook-tabs" id="notebook-tabs-container">
+                <button class="nb-tab-btn active" data-tab="journal">Field Journal</button>
+                <button class="nb-tab-btn" data-tab="pinboard">Evidence Board</button>
+                <button class="nb-tab-btn" data-tab="deductions" id="tab-btn-deductions" style="display: none;">Deductions & Hypotheses (<span id="unlocked-deductions-count">0</span>)</button>
+            </div>
+
+            <!-- Tab Body -->
+            <div id="nb-tab-content" class="notebook-body">
+                <!-- Dynamically populated from notebook_ui.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Pause Menu Overlay -->
+    <div id="pause-menu" class="fixed inset-0 bg-black bg-opacity-90 backdrop-filter blur-md z-150 hidden flex-col items-center justify-center">
+        <div class="w-80 border border-yellow-700 bg-gray-950 p-6 rounded shadow-2xl text-center">
+            <h2 class="font-serif text-2xl text-yellow-400 font-bold mb-6 tracking-widest uppercase">Investigation Paused</h2>
+            <div class="space-y-3">
+                <button id="resume-btn" class="w-full py-2 bg-yellow-600 hover:bg-yellow-500 text-black font-bold font-serif rounded">Resume</button>
+                <button id="save-btn" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-serif rounded">Save Game (SQLite)</button>
+                <button id="load-btn" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-serif rounded">Load Game</button>
+                <button id="reset-btn" class="w-full py-2 bg-red-950 border border-red-800 hover:bg-red-900 text-red-200 font-serif rounded text-xs">Reset Investigation</button>
+            </div>
+            <p class="text-xs text-gray-500 mt-6 font-mono">Press [ESC] to return</p>
+        </div>
+    </div>
+
+    <!-- Exhibition Title Screen -->
+    <div id="title-screen">
+        <div class="title-logo">THE HOUSE THAT REMEMBERED</div>
+        <div class="title-sub">Offline First-Person 3D Mystery Exploration</div>
+
+        <button id="start-game-btn" class="start-btn">
+            BEGIN INVESTIGATION
+        </button>
+
+        <div class="controls-hint">
+            <div><span class="key-tag">W</span><span class="key-tag">A</span><span class="key-tag">S</span><span class="key-tag">D</span> Walk</div>
+            <div><span class="key-tag">Mouse</span> Look Around</div>
+            <div><span class="key-tag">E</span> Examine Clue</div>
+            <div><span class="key-tag">N</span> / <span class="key-tag">Tab</span> Notebook</div>
+            <div><span class="key-tag">Shift</span> Sprint</div>
+            <div><span class="key-tag">Space</span> Jump</div>
+            <div><span class="key-tag">Esc</span> Pause</div>
+        </div>
+
+        <p class="text-xs text-gray-600 mt-6 tracking-widest font-mono">COLLEGE EXHIBITION PROJECT &bull; RUNS 100% OFFLINE</p>
+    </div>
+
+    <!-- Offline Scripts Bundle -->
+    <script src="/static/vendor/three.min.js"></script>
+    <script src="/static/vendor/PointerLockControls.js"></script>
+    <script src="/static/js/story_config.js"></script>
+    <script src="/static/js/audio.js"></script>
+    <script src="/static/js/textures.js"></script>
+    <script src="/static/js/player_controller.js"></script>
+    <script src="/static/js/game_state.js"></script>
+    <script src="/static/js/notebook_ui.js"></script>
+    <script src="/static/js/house_builder.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

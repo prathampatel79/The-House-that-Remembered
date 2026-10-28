@@ -1,0 +1,14 @@
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+.venv/
+.vscode/
+
+# PyInstaller build outputs (keep the root TheHouseThatRemembered.exe)
+build/
+dist/
+the house that remembered.exe
+
+# SQLite temporary files
+*.db-journal
+*.db-wal
